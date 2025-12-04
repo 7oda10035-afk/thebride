@@ -1267,4 +1267,270 @@ BOOKINGS_TEMPLATE = """{% extends "base.html" %}
                 <td>{{ booking.dress.dress_number }}</td>
                 <td>{{ booking.booking_date.strftime('%Y-%m-%d') }}</td>
                 <td>{{ booking.return_date.strftime('%Y-%m-%d') if booking.return_date else '-' }}</td>
-                <td>{{ "%.2f"|format(booking.deposit_paid
+                <td>{{ "%.2f"|format(booking.deposit_paid) }} ريال</td>
+                <td>
+                    <span style="padding: 5px 10px; border-radius: 15px; 
+                                 background: {% if booking.status == 'active' %}#d4edda{% else %}#d1ecf1{% endif %};
+                                 color: {% if booking.status == 'active' %}#155724{% else %}#0c5460{% endif %};">
+                        {{ "نشط" if booking.status == 'active' else "تم الإرجاع" }}
+                    </span>
+                </td>
+                <td>
+                    {% if booking.status == 'active' %}
+                    <form action="{{ url_for('return_booking', booking_id=booking.id) }}" method="POST" 
+                          style="display: inline;" onsubmit="return confirm('هل تريد تسجيل إرجاع هذا الفستان؟');">
+                        <button type="submit" class="btn btn-success" style="padding: 5px 10px;">إرجاع</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 40px;">لا توجد حجوزات</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+document.getElementById('search').addEventListener('keyup', function(e) {
+    if (e.key === 'Enter') {
+        window.location.href = `?search=${this.value}&status=${document.getElementById('status').value}`;
+    }
+});
+document.getElementById('status').addEventListener('change', function() {
+    window.location.href = `?search=${document.getElementById('search').value}&status=${this.value}`;
+});
+</script>
+{% endblock %}
+"""
+
+# قالب التحقق من الإتاحة
+AVAILABILITY_TEMPLATE = """{% extends "base.html" %}
+
+{% block title %}التحقق من الإتاحة{% endblock %}
+
+{% block content %}
+<h1 style="color: #8B4513; margin-bottom: 30px;">🔍 التحقق من إتاحة الفساتين</h1>
+
+<div class="form-container" style="max-width: 600px;">
+    <form method="POST">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label>التاريخ المطلوب *</label>
+                <input type="date" name="check_date" required value="{{ now.strftime('%Y-%m-%d') }}">
+            </div>
+            
+            <div class="form-group">
+                <label>التصنيف</label>
+                <select name="category">
+                    <option value="all">جميع التصنيفات</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat[0] }}">{{ cat[0] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px;">
+            <button type="submit" class="btn btn-primary" style="padding: 12px 30px;">🔍 تحقق من الإتاحة</button>
+        </div>
+    </form>
+</div>
+
+{% if is_available is not none %}
+<div style="margin-top: 40px;">
+    {% if is_available %}
+    <div style="background: #d4edda; color: #155724; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+        <h2 style="color: #155724;">✅ يوجد {{ available_dresses|length }} فستان(ات) متاح(ة) في هذا التاريخ</h2>
+    </div>
+    
+    <div style="background: white; border-radius: 10px; overflow: hidden;">
+        <table>
+            <thead>
+                <tr>
+                    <th>رقم الفستان</th>
+                    <th>النموذج</th>
+                    <th>التصنيف</th>
+                    <th>اللون</th>
+                    <th>السعر</th>
+                    <th>الإجراء</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dress in available_dresses %}
+                <tr>
+                    <td><strong>{{ dress.dress_number }}</strong></td>
+                    <td>{{ dress.model_name }}</td>
+                    <td>{{ dress.category }}</td>
+                    <td>{{ dress.color }}</td>
+                    <td>{{ "%.2f"|format(dress.rental_price) }} ريال</td>
+                    <td>
+                        <a href="{{ url_for('add_booking') }}?dress_id={{ dress.id }}" 
+                           class="btn btn-success" style="padding: 5px 10px;">حجز</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="background: #f8d7da; color: #721c24; padding: 20px; border-radius: 10px; text-align: center;">
+        <h2 style="color: #721c24;">❌ لا توجد فساتين متاحة في التاريخ المحدد</h2>
+        <p style="margin-top: 10px;">يرجى اختيار تاريخ آخر أو التحقق من الفساتين في تصنيف مختلف.</p>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<script>
+// تعيين الحد الأدنى للتاريخ هو اليوم
+const today = new Date().toISOString().split('T')[0];
+document.querySelector('input[name="check_date"]').min = today;
+</script>
+{% endblock %}
+"""
+
+# قالب التقارير
+REPORTS_TEMPLATE = """{% extends "base.html" %}
+
+{% block title %}التقارير{% endblock %}
+
+{% block content %}
+<h1 style="color: #8B4513; margin-bottom: 30px;">📈 التقارير والإحصائيات</h1>
+
+<div class="cards">
+    <div class="card">
+        <h3>عدد الحجوزات هذا الشهر</h3>
+        <div class="number">{{ monthly_bookings }}</div>
+    </div>
+    
+    <div class="card">
+        <h3>إجمالي الإيرادات هذا الشهر</h3>
+        <div class="number">{{ "%.2f"|format(monthly_revenue) }} ريال</div>
+    </div>
+</div>
+
+<div style="margin-top: 40px;">
+    <h2 style="color: #8B4513; margin-bottom: 20px;">🏆 الفساتين الأكثر طلباً</h2>
+    <div style="background: white; border-radius: 10px; overflow: hidden;">
+        <table>
+            <thead>
+                <tr>
+                    <th>رقم الفستان</th>
+                    <th>النموذج</th>
+                    <th>عدد مرات الحجز</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dress in popular_dresses %}
+                <tr>
+                    <td><strong>{{ dress[0] }}</strong></td>
+                    <td>{{ dress[1] }}</td>
+                    <td>{{ dress[2] }} مرة</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" style="text-align: center; padding: 40px;">لا توجد بيانات</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div style="margin-top: 40px; background: white; padding: 20px; border-radius: 10px;">
+    <h2 style="color: #8B4513; margin-bottom: 20px;">📊 معلومات النظام</h2>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+            <h3 style="color: #555;">إجمالي الفساتين:</h3>
+            <p style="font-size: 24px; font-weight: bold; color: #8B4513;">{{ total_dresses }}</p>
+        </div>
+        <div>
+            <h3 style="color: #555;">إجمالي الحجوزات:</h3>
+            <p style="font-size: 24px; font-weight: bold; color: #8B4513;">{{ total_bookings }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+"""
+
+# ====================================================================
+# VI. إنشاء الملفات والتشغيل
+# ====================================================================
+
+def create_templates():
+    """إنشاء جميع قوالب HTML"""
+    templates_dir = 'templates'
+    if not os.path.exists(templates_dir):
+        os.makedirs(templates_dir)
+        print(f"تم إنشاء مجلد القوالب: {templates_dir}")
+    
+    # جميع القوالب المطلوبة
+    templates = {
+        'base.html': BASE_TEMPLATE,
+        'login.html': LOGIN_TEMPLATE,
+        'dashboard.html': DASHBOARD_TEMPLATE,
+        'dresses.html': DRESSES_TEMPLATE,
+        'add_dress.html': ADD_DRESS_TEMPLATE,
+        'edit_dress.html': EDIT_DRESS_TEMPLATE,
+        'add_booking.html': ADD_BOOKING_TEMPLATE,
+        'bookings.html': BOOKINGS_TEMPLATE,
+        'availability.html': AVAILABILITY_TEMPLATE,
+        'reports.html': REPORTS_TEMPLATE,
+    }
+    
+    for filename, content in templates.items():
+        filepath = os.path.join(templates_dir, filename)
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(content)
+        print(f"تم كتابة الملف: {filepath}")
+
+# ====================================================================
+# VII. نقطة البداية
+# ====================================================================
+
+if __name__ == '__main__':
+    # إضافة now إلى سياق القوالب
+    @app.context_processor
+    def inject_now():
+        return {'now': datetime.now()}
+    
+    # إضافة total_bookings إلى سياق القوالب
+    @app.context_processor
+    def inject_totals():
+        return {'total_bookings': Booking.query.count()}
+    
+    # إنشاء مجلد التحميلات
+    if not os.path.exists(app.config['UPLOAD_FOLDER']):
+        os.makedirs(app.config['UPLOAD_FOLDER'])
+    
+    # إنشاء القوالب
+    create_templates()
+    
+    # إنشاء قاعدة البيانات والبيانات الأولية
+    with app.app_context():
+        db.create_all()
+        create_initial_data()
+    
+    print("\n" + "="*60)
+    print("✅ نظام THE Bride جاهز للعمل!")
+    print("="*60)
+    print(f"📊 الوصول عبر: http://127.0.0.1:5000/")
+    print(f"🔑 بيانات الدخول:")
+    print(f"   📧 البريد: 7oda10035@gmail.com")
+    print(f"   🔐 كلمة المرور: Ma7moowd10035")
+    print("="*60)
+    print("🎯 المميزات الجديدة:")
+    print("   1. دخول واحد دائم بعد التسجيل الأول")
+    print("   2. إدارة كاملة للفساتين مع صور")
+    print("   3. تفاصيل متكاملة لكل فستان")
+    print("   4. نظام حجوزات متقدم")
+    print("   5. تقارير وإحصائيات")
+    print("   6. واجهة عربية متكاملة")
+    print("="*60)
+    print("\n🚀 جاري تشغيل النظام...")
+    
+    # تشغيل التطبيق
+    app.run(debug=True, host='0.0.0.0', port=5000)
