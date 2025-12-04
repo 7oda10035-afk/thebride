@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}لوحة التحكم{% endblock %}
+
+{% block content %}
+<h1 style="color: #8B4513; margin-bottom: 30px;">📊 لوحة التحكم</h1>
+
+<div class="cards">
+    <div class="card">
+        <h3>إجمالي الفساتين</h3>
+        <div class="number">{{ total_dresses }}</div>
+    </div>
+    <div class="card">
+        <h3>الفساتين المتاحة</h3>
+        <div class="number">{{ available_dresses }}</div>
+    </div>
+    <div class="card">
+        <h3>الحجوزات النشطة</h3>
+        <div class="number">{{ active_bookings }}</div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px;">
+    <div>
+        <h2 style="color: #8B4513; margin-bottom: 15px;">📅 الحجوزات القادمة</h2>
+        <div style="background: white; padding: 20px; border-radius: 10px;">
+            {% if upcoming_bookings %}
+                {% for booking in upcoming_bookings %}
+                <div style="padding: 10px; border-bottom: 1px solid #eee;">
+                    <strong>{{ booking.customer_name }}</strong><br>
+                    فستان: {{ booking.dress.dress_number }}<br>
+                    التاريخ: {{ booking.booking_date.strftime('%Y-%m-%d') }}
+                </div>
+                {% endfor %}
+            {% else %}
+                <p style="text-align: center; color: #666;">لا توجد حجوزات قادمة</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div>
+        <h2 style="color: #8B4513; margin-bottom: 15px;">📋 الفساتين التي يجب إرجاعها اليوم</h2>
+        <div style="background: white; padding: 20px; border-radius: 10px;">
+            {% if due_today %}
+                {% for booking in due_today %}
+                <div style="padding: 10px; border-bottom: 1px solid #eee;">
+                    <strong>{{ booking.customer_name }}</strong><br>
+                    فستان: {{ booking.dress.dress_number }}<br>
+                    هاتف: {{ booking.customer_phone }}
+                </div>
+                {% endfor %}
+            {% else %}
+                <p style="text-align: center; color: #666;">لا توجد فساتين مستحقة اليوم</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 30px; text-align: center;">
+    <a href="{{ url_for('add_booking') }}" class="btn btn-primary" style="margin: 5px;">➕ إضافة حجز جديد</a>
+    <a href="{{ url_for('add_dress') }}" class="btn btn-success" style="margin: 5px;">👗 إضافة فستان جديد</a>
+    <a href="{{ url_for('check_availability') }}" class="btn btn-primary" style="margin: 5px;">🔍 التحقق من الإتاحة</a>
+</div>
+{% endblock %}

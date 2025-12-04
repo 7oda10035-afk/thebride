@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}إضافة فستان جديد{% endblock %}
+
+{% block content %}
+<h1 style="color: #8B4513; margin-bottom: 30px;">👗 إضافة فستان جديد</h1>
+
+<div class="form-container">
+    <form method="POST" enctype="multipart/form-data">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label>رقم الفستان *</label>
+                <input type="text" name="dress_number" required placeholder="مثال: 1001A">
+            </div>
+            
+            <div class="form-group">
+                <label>اسم النموذج</label>
+                <input type="text" name="model_name" placeholder="مثال: The Royal Princess">
+            </div>
+            
+            <div class="form-group">
+                <label>التصنيف</label>
+                <select name="category">
+                    <option value="فستان زفاف">فستان زفاف</option>
+                    <option value="سواريه">سواريه</option>
+                    <option value="فستان سهرة">فستان سهرة</option>
+                    <option value="فستان خطوبة">فستان خطوبة</option>
+                    <option value="أخرى">أخرى</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>اللون</label>
+                <input type="text" name="color" placeholder="مثال: أبيض عاجي">
+            </div>
+            
+            <div class="form-group">
+                <label>أنواع الأقمشة</label>
+                <input type="text" name="fabric_types" placeholder="مثال: ساتان, شيفون, دانتيل">
+            </div>
+            
+            <div class="form-group">
+                <label>السعر (ريال)</label>
+                <input type="number" name="rental_price" step="0.01" value="0">
+            </div>
+            
+            <div class="form-group">
+                <label>المقاس</label>
+                <select name="size">
+                    <option value="XS">XS</option>
+                    <option value="S">S</option>
+                    <option value="M" selected>M</option>
+                    <option value="L">L</option>
+                    <option value="XL">XL</option>
+                    <option value="XXL">XXL</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>تفاصيل إضافية</label>
+            <textarea name="details" rows="3" placeholder="أي تفاصيل إضافية عن الفستان..."></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label>صورة الفستان (اختياري)</label>
+            <input type="file" name="image" accept="image/*">
+            <small style="color: #666;">يمكن رفع صور PNG, JPG, JPEG, GIF (حتى 16MB)</small>
+        </div>
+        
+        <div class="form-group">
+            <label style="display: inline-block; margin-right: 10px;">
+                <input type="checkbox" name="is_available" checked> متاح للحجز
+            </label>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <button type="submit" class="btn btn-primary" style="padding: 12px 30px;">💾 حفظ الفستان</button>
+            <a href="{{ url_for('dresses_list') }}" class="btn" 
+               style="background: #6c757d; color: white; padding: 12px 30px; margin-right: 10px;">إلغاء</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}التحقق من الإتاحة{% endblock %}
+
+{% block content %}
+<h1 style="color: #8B4513; margin-bottom: 30px;">🔍 التحقق من إتاحة الفساتين</h1>
+
+<div class="form-container" style="max-width: 600px;">
+    <form method="POST">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label>التاريخ المطلوب *</label>
+                <input type="date" name="check_date" required value="{{ now.strftime('%Y-%m-%d') }}">
+            </div>
+            
+            <div class="form-group">
+                <label>التصنيف</label>
+                <select name="category">
+                    <option value="all">جميع التصنيفات</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat[0] }}">{{ cat[0] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px;">
+            <button type="submit" class="btn btn-primary" style="padding: 12px 30px;">🔍 تحقق من الإتاحة</button>
+        </div>
+    </form>
+</div>
+
+{% if is_available is not none %}
+<div style="margin-top: 40px;">
+    {% if is_available %}
+    <div style="background: #d4edda; color: #155724; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+        <h2 style="color: #155724;">✅ يوجد {{ available_dresses|length }} فستان(ات) متاح(ة) في هذا التاريخ</h2>
+    </div>
+    
+    <div style="background: white; border-radius: 10px; overflow: hidden;">
+        <table>
+            <thead>
+                <tr>
+                    <th>رقم الفستان</th>
+                    <th>النموذج</th>
+                    <th>التصنيف</th>
+                    <th>اللون</th>
+                    <th>السعر</th>
+                    <th>الإجراء</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dress in available_dresses %}
+                <tr>
+                    <td><strong>{{ dress.dress_number }}</strong></td>
+                    <td>{{ dress.model_name }}</td>
+                    <td>{{ dress.category }}</td>
+                    <td>{{ dress.color }}</td>
+                    <td>{{ "%.2f"|format(dress.rental_price) }} ريال</td>
+                    <td>
+                        <a href="{{ url_for('add_booking') }}?dress_id={{ dress.id }}" 
+                           class="btn btn-success" style="padding: 5px 10px;">حجز</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="background: #f8d7da; color: #721c24; padding: 20px; border-radius: 10px; text-align: center;">
+        <h2 style="color: #721c24;">❌ لا توجد فساتين متاحة في التاريخ المحدد</h2>
+        <p style="margin-top: 10px;">يرجى اختيار تاريخ آخر أو التحقق من الفساتين في تصنيف مختلف.</p>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<script>
+// تعيين الحد الأدنى للتاريخ هو اليوم
+const today = new Date().toISOString().split('T')[0];
+document.querySelector('input[name="check_date"]').min = today;
+</script>
+{% endblock %}

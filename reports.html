@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}التقارير{% endblock %}
+
+{% block content %}
+<h1 style="color: #8B4513; margin-bottom: 30px;">📈 التقارير والإحصائيات</h1>
+
+<div class="cards">
+    <div class="card">
+        <h3>عدد الحجوزات هذا الشهر</h3>
+        <div class="number">{{ monthly_bookings }}</div>
+    </div>
+    
+    <div class="card">
+        <h3>إجمالي الإيرادات هذا الشهر</h3>
+        <div class="number">{{ "%.2f"|format(monthly_revenue) }} ريال</div>
+    </div>
+</div>
+
+<div style="margin-top: 40px;">
+    <h2 style="color: #8B4513; margin-bottom: 20px;">🏆 الفساتين الأكثر طلباً</h2>
+    <div style="background: white; border-radius: 10px; overflow: hidden;">
+        <table>
+            <thead>
+                <tr>
+                    <th>رقم الفستان</th>
+                    <th>النموذج</th>
+                    <th>عدد مرات الحجز</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dress in popular_dresses %}
+                <tr>
+                    <td><strong>{{ dress[0] }}</strong></td>
+                    <td>{{ dress[1] }}</td>
+                    <td>{{ dress[2] }} مرة</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" style="text-align: center; padding: 40px;">لا توجد بيانات</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div style="margin-top: 40px; background: white; padding: 20px; border-radius: 10px;">
+    <h2 style="color: #8B4513; margin-bottom: 20px;">📊 معلومات النظام</h2>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+            <h3 style="color: #555;">إجمالي الفساتين:</h3>
+            <p style="font-size: 24px; font-weight: bold; color: #8B4513;">{{ total_dresses }}</p>
+        </div>
+        <div>
+            <h3 style="color: #555;">إجمالي الحجوزات:</h3>
+            <p style="font-size: 24px; font-weight: bold; color: #8B4513;">{{ total_bookings }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

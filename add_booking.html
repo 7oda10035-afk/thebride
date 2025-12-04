@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}إضافة حجز جديد{% endblock %}
+
+{% block content %}
+<h1 style="color: #8B4513; margin-bottom: 30px;">📝 إضافة حجز جديد</h1>
+
+<div class="form-container">
+    <form method="POST">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label>اختر الفستان *</label>
+                <select name="dress_id" required>
+                    <option value="">-- اختر فستان --</option>
+                    {% for dress in dresses %}
+                    <option value="{{ dress.id }}" {% if request.args.get('dress_id')|int == dress.id %}selected{% endif %}>
+                        {{ dress.dress_number }} - {{ dress.model_name }} ({{ dress.rental_price }} ريال)
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>اسم العميل *</label>
+                <input type="text" name="customer_name" required>
+            </div>
+            
+            <div class="form-group">
+                <label>رقم الهاتف</label>
+                <input type="text" name="customer_phone">
+            </div>
+            
+            <div class="form-group">
+                <label>البريد الإلكتروني</label>
+                <input type="email" name="customer_email">
+            </div>
+            
+            <div class="form-group">
+                <label>تاريخ الحجز *</label>
+                <input type="date" name="booking_date" required value="{{ now.strftime('%Y-%m-%d') }}">
+            </div>
+            
+            <div class="form-group">
+                <label>تاريخ الإرجاع</label>
+                <input type="date" name="return_date">
+            </div>
+            
+            <div class="form-group">
+                <label>السعر الإجمالي (ريال)</label>
+                <input type="number" name="total_price" step="0.01" value="0">
+            </div>
+            
+            <div class="form-group">
+                <label>المبلغ المدفوع (ريال)</label>
+                <input type="number" name="deposit_paid" step="0.01" value="0">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>ملاحظات</label>
+            <textarea name="notes" rows="3" placeholder="أي ملاحظات حول الحجز..."></textarea>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <button type="submit" class="btn btn-primary" style="padding: 12px 30px;">💾 حفظ الحجز</button>
+            <a href="{{ url_for('bookings_list') }}" class="btn" 
+               style="background: #6c757d; color: white; padding: 12px 30px; margin-right: 10px;">إلغاء</a>
+        </div>
+    </form>
+</div>
+
+<script>
+// تعيين الحد الأدنى للتاريخ هو اليوم
+const today = new Date().toISOString().split('T')[0];
+document.querySelector('input[name="booking_date"]').min = today;
+document.querySelector('input[name="return_date"]').min = today;
+</script>
+{% endblock %}

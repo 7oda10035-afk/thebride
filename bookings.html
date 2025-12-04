@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}الحجوزات{% endblock %}
+
+{% block content %}
+<h1 style="color: #8B4513; margin-bottom: 20px;">📅 إدارة الحجوزات</h1>
+
+<div style="margin-bottom: 20px; display: flex; gap: 10px;">
+    <input type="text" id="search" placeholder="بحث باسم العميل أو الهاتف..." value="{{ search_query }}"
+           style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+    <select id="status" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+        <option value="all" {% if current_status == 'all' %}selected{% endif %}>جميع الحالات</option>
+        <option value="active" {% if current_status == 'active' %}selected{% endif %}>نشطة</option>
+        <option value="returned" {% if current_status == 'returned' %}selected{% endif %}>تم الإرجاع</option>
+    </select>
+    <a href="{{ url_for('add_booking') }}" class="btn btn-primary">➕ إضافة حجز</a>
+</div>
+
+<div style="background: white; border-radius: 10px; overflow: hidden;">
+    <table>
+        <thead>
+            <tr>
+                <th>العميل</th>
+                <th>الفستان</th>
+                <th>تاريخ الحجز</th>
+                <th>تاريخ الإرجاع</th>
+                <th>المبلغ المدفوع</th>
+                <th>الحالة</th>
+                <th>الإجراءات</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in bookings %}
+            <tr>
+                <td>
+                    <strong>{{ booking.customer_name }}</strong><br>
+                    <small>{{ booking.customer_phone }}</small>
+                </td>
+                <td>{{ booking.dress.dress_number }}</td>
+                <td>{{ booking.booking_date.strftime('%Y-%m-%d') }}</td>
+                <td>{{ booking.return_date.strftime('%Y-%m-%d') if booking.return_date else '-' }}</td>
+                <td>{{ "%.2f"|format(booking.deposit_paid) }} ريال</td>
+                <td>
+                    <span style="padding: 5px 10px; border-radius: 15px; 
+                                 background: {% if booking.status == 'active' %}#d4edda{% else %}#d1ecf1{% endif %};
+                                 color: {% if booking.status == 'active' %}#155724{% else %}#0c5460{% endif %};">
+                        {{ "نشط" if booking.status == 'active' else "تم الإرجاع" }}
+                    </span>
+                </td>
+                <td>
+                    {% if booking.status == 'active' %}
+                    <form action="{{ url_for('return_booking', booking_id=booking.id) }}" method="POST" 
+                          style="display: inline;" onsubmit="return confirm('هل تريد تسجيل إرجاع هذا الفستان؟');">
+                        <button type="submit" class="btn btn-success" style="padding: 5px 10px;">إرجاع</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 40px;">لا توجد حجوزات</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+document.getElementById('search').addEventListener('keyup', function(e) {
+    if (e.key === 'Enter') {
+        window.location.href = `?search=${this.value}&status=${document.getElementById('status').value}`;
+    }
+});
+document.getElementById('status').addEventListener('change', function() {
+    window.location.href = `?search=${document.getElementById('search').value}&status=${this.value}`;
+});
+</script>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}تعديل فستان{% endblock %}
+
+{% block content %}
+<h1 style="color: #8B4513; margin-bottom: 30px;">✏️ تعديل فستان: {{ dress.dress_number }}</h1>
+
+<div class="form-container">
+    <form method="POST" enctype="multipart/form-data">
+        {% if dress.image_data %}
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="{{ url_for('dress_image', dress_id=dress.id) }}" 
+                 style="max-width: 300px; max-height: 400px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <br>
+            <label style="margin-top: 10px; display: inline-block;">
+                <input type="checkbox" name="remove_image" value="1"> إزالة الصورة
+            </label>
+        </div>
+        {% endif %}
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label>رقم الفستان</label>
+                <input type="text" value="{{ dress.dress_number }}" readonly style="background: #f8f9fa;">
+                <small style="color: #666;">لا يمكن تغيير رقم الفستان</small>
+            </div>
+            
+            <div class="form-group">
+                <label>اسم النموذج</label>
+                <input type="text" name="model_name" value="{{ dress.model_name or '' }}">
+            </div>
+            
+            <div class="form-group">
+                <label>التصنيف</label>
+                <select name="category">
+                    <option value="فستان زفاف" {% if dress.category == 'فستان زفاف' %}selected{% endif %}>فستان زفاف</option>
+                    <option value="سواريه" {% if dress.category == 'سواريه' %}selected{% endif %}>سواريه</option>
+                    <option value="فستان سهرة" {% if dress.category == 'فستان سهرة' %}selected{% endif %}>فستان سهرة</option>
+                    <option value="فستان خطوبة" {% if dress.category == 'فستان خطوبة' %}selected{% endif %}>فستان خطوبة</option>
+                    <option value="أخرى" {% if dress.category == 'أخرى' %}selected{% endif %}>أخرى</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>اللون</label>
+                <input type="text" name="color" value="{{ dress.color or '' }}">
+            </div>
+            
+            <div class="form-group">
+                <label>أنواع الأقمشة</label>
+                <input type="text" name="fabric_types" value="{{ dress.fabric_types or '' }}">
+            </div>
+            
+            <div class="form-group">
+                <label>السعر (ريال)</label>
+                <input type="number" name="rental_price" step="0.01" value="{{ dress.rental_price or 0 }}">
+            </div>
+            
+            <div class="form-group">
+                <label>المقاس</label>
+                <select name="size">
+                    {% for size in ['XS', 'S', 'M', 'L', 'XL', 'XXL'] %}
+                    <option value="{{ size }}" {% if dress.size == size %}selected{% endif %}>{{ size }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>تفاصيل إضافية</label>
+            <textarea name="details" rows="3">{{ dress.details or '' }}</textarea>
+        </div>
+        
+        <div class="form-group">
+            <label>صورة جديدة (اختياري)</label>
+            <input type="file" name="image" accept="image/*">
+            <small style="color: #666;">يمكن رفع صور PNG, JPG, JPEG, GIF</small>
+        </div>
+        
+        <div class="form-group">
+            <label style="display: inline-block; margin-right: 10px;">
+                <input type="checkbox" name="is_available" {% if dress.is_available %}checked{% endif %}> متاح للحجز
+            </label>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <button type="submit" class="btn btn-primary" style="padding: 12px 30px;">💾 حفظ التعديلات</button>
+            <a href="{{ url_for('dresses_list') }}" class="btn" 
+               style="background: #6c757d; color: white; padding: 12px 30px; margin-right: 10px;">إلغاء</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

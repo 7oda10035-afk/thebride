@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تسجيل الدخول - THE Bride</title>
+    <style>
+        body { 
+            background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Tahoma, Arial, sans-serif;
+        }
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .login-box h1 { color: #8B4513; margin-bottom: 30px; }
+        .form-group { margin-bottom: 20px; text-align: right; }
+        label { display: block; margin-bottom: 8px; color: #555; }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #8B4513;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover { background: #654321; }
+        .login-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            text-align: right;
+            font-size: 14px;
+        }
+        .login-info strong { color: #8B4513; }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h1>👰 THE Bride</h1>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div style="padding: 10px; background: {% if category == 'danger' %}#f8d7da{% else %}#d4edda{% endif %}; 
+                                color: {% if category == 'danger' %}#721c24{% else %}#155724{% endif %};
+                                border-radius: 5px; margin-bottom: 20px;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="POST">
+            <div class="form-group">
+                <label>البريد الإلكتروني:</label>
+                <input type="email" name="email" required autofocus>
+            </div>
+            <div class="form-group">
+                <label>كلمة المرور:</label>
+                <input type="password" name="password" required>
+            </div>
+            <button type="submit">تسجيل الدخول</button>
+        </form>
+        
+        <div class="login-info">
+            <p><strong>بيانات الدخول:</strong></p>
+            <p>البريد: 7oda10035@gmail.com</p>
+            <p>كلمة المرور: Ma7moowd10035</p>
+        </div>
+    </div>
+</body>
+</html>

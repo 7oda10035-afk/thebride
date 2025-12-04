@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE Bride - نظام إدارة الفساتين</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Tahoma, Arial, sans-serif; }
+        body { background: #f5f5f5; color: #333; }
+        
+        /* الشريط الجانبي */
+        .sidebar {
+            width: 250px;
+            background: #8B4513;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            right: 0;
+            top: 0;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        .sidebar h2 { color: #FFD700; margin-bottom: 20px; text-align: center; }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 12px 15px;
+            margin: 5px 0;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .sidebar a:hover { background: #A0522D; }
+        .sidebar a.active { background: #A0522D; border-right: 4px solid #FFD700; }
+        
+        /* المحتوى الرئيسي */
+        .main-content { margin-right: 270px; padding: 20px; }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 { color: #8B4513; }
+        .logout-btn { background: #dc3545; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; }
+        .logout-btn:hover { background: #c82333; }
+        
+        /* البطاقات */
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .card h3 { color: #8B4513; margin-bottom: 10px; }
+        .card .number { font-size: 32px; font-weight: bold; color: #8B4513; }
+        
+        /* الجداول */
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; }
+        th { background: #8B4513; color: white; padding: 15px; text-align: right; }
+        td { padding: 12px 15px; border-bottom: 1px solid #eee; }
+        tr:hover { background: #f9f9f9; }
+        
+        /* النماذج */
+        .form-container { background: white; padding: 30px; border-radius: 10px; max-width: 800px; margin: 0 auto; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #555; font-weight: bold; }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        input:focus, select:focus, textarea:focus { border-color: #8B4513; outline: none; }
+        
+        /* الأزرار */
+        .btn { display: inline-block; padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; text-decoration: none; }
+        .btn-primary { background: #8B4513; color: white; }
+        .btn-primary:hover { background: #654321; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        
+        /* التنبيهات */
+        .alert { padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        
+        /* متجاوب */
+        @media (max-width: 768px) {
+            .sidebar { width: 100%; height: auto; position: relative; }
+            .main-content { margin-right: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>👰 THE Bride</h2>
+        <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint == 'dashboard' else '' }}">📊 لوحة التحكم</a>
+        <a href="{{ url_for('dresses_list') }}" class="{{ 'active' if request.endpoint == 'dresses_list' else '' }}">👗 الفساتين</a>
+        <a href="{{ url_for('add_dress') }}" class="{{ 'active' if request.endpoint == 'add_dress' else '' }}">➕ إضافة فستان</a>
+        <a href="{{ url_for('bookings_list') }}" class="{{ 'active' if request.endpoint in ['bookings_list', 'add_booking'] else '' }}">📅 الحجوزات</a>
+        <a href="{{ url_for('check_availability') }}" class="{{ 'active' if request.endpoint == 'check_availability' else '' }}">🔍 التحقق من الإتاحة</a>
+        <a href="{{ url_for('reports') }}" class="{{ 'active' if request.endpoint == 'reports' else '' }}">📈 التقارير</a>
+    </div>
+    
+    <div class="main-content">
+        <div class="header">
+            <h1>{% block title %}THE Bride{% endblock %}</h1>
+            <div>
+                <span>مرحباً بك!</span>
+                <a href="{{ url_for('logout') }}" class="logout-btn">تسجيل الخروج</a>
+            </div>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

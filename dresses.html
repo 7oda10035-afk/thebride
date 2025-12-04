@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}الفساتين{% endblock %}
+
+{% block content %}
+<h1 style="color: #8B4513; margin-bottom: 20px;">👗 إدارة الفساتين</h1>
+
+<div style="margin-bottom: 20px; display: flex; gap: 10px;">
+    <input type="text" id="search" placeholder="بحث..." value="{{ search_query }}" 
+           style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+    <select id="category" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+        <option value="all">جميع التصنيفات</option>
+        {% for cat in categories %}
+        <option value="{{ cat[0] }}" {% if current_category == cat[0] %}selected{% endif %}>{{ cat[0] }}</option>
+        {% endfor %}
+    </select>
+    <a href="{{ url_for('add_dress') }}" class="btn btn-primary">➕ إضافة فستان</a>
+</div>
+
+<div style="background: white; border-radius: 10px; overflow: hidden;">
+    <table>
+        <thead>
+            <tr>
+                <th>رقم الفستان</th>
+                <th>النموذج</th>
+                <th>التصنيف</th>
+                <th>اللون</th>
+                <th>السعر</th>
+                <th>الحالة</th>
+                <th>الإجراءات</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dress in dresses %}
+            <tr>
+                <td><strong>{{ dress.dress_number }}</strong></td>
+                <td>{{ dress.model_name }}</td>
+                <td>{{ dress.category }}</td>
+                <td>{{ dress.color }}</td>
+                <td>{{ "%.2f"|format(dress.rental_price) }} ريال</td>
+                <td>
+                    <span style="padding: 5px 10px; border-radius: 15px; 
+                                 background: {% if dress.is_available %}#d4edda{% else %}#f8d7da{% endif %};
+                                 color: {% if dress.is_available %}#155724{% else %}#721c24{% endif %};">
+                        {{ "متاح" if dress.is_available else "محجوز" }}
+                    </span>
+                </td>
+                <td>
+                    <a href="{{ url_for('edit_dress', dress_id=dress.id) }}" class="btn" 
+                       style="background: #ffc107; color: #212529; padding: 5px 10px;">تعديل</a>
+                    {% if dress.is_available %}
+                    <form action="{{ url_for('delete_dress', dress_id=dress.id) }}" method="POST" 
+                          style="display: inline;" onsubmit="return confirm('هل أنت متأكد؟');">
+                        <button type="submit" class="btn btn-danger" style="padding: 5px 10px;">حذف</button>
+                    </form>
+                    {% endif %}
+                    <a href="{{ url_for('add_booking') }}?dress_id={{ dress.id }}" 
+                       class="btn btn-success" style="padding: 5px 10px;">حجز</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 40px;">لا توجد فساتين</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+document.getElementById('search').addEventListener('keyup', function(e) {
+    if (e.key === 'Enter') {
+        window.location.href = `?search=${this.value}&category=${document.getElementById('category').value}`;
+    }
+});
+document.getElementById('category').addEventListener('change', function() {
+    window.location.href = `?search=${document.getElementById('search').value}&category=${this.value}`;
+});
+</script>
+{% endblock %}
